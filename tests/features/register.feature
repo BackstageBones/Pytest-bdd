@@ -2,6 +2,7 @@
 Feature: Automation practice user registration
   # Enter feature description here
 
+  @acceptance
   Scenario: Register new user
     Given User opens automation practice website
     When User chooses to sign in

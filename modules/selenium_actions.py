@@ -1,6 +1,7 @@
 import time
 from typing import Any
 
+from selenium.common import StaleElementReferenceException, ElementClickInterceptedException
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import Keys
 from selenium.webdriver.remote.webdriver import WebElement
@@ -15,7 +16,7 @@ class SeleniumActions:
     def __init__(self, driver):
         self.driver = driver
 
-    def find_element(self, locator: tuple) -> WebElement:
+    def find_element(self, locator: Any) -> WebElement:
         return self.driver.find_element(*locator)
 
     def find_elements(self, locator: tuple) -> list:
@@ -26,15 +27,25 @@ class SeleniumActions:
             ec.visibility_of_any_elements_located(locator)
         )
 
-    def click_element(self, locator: Any) -> None:
-        element = WebDriverWait(self.driver, timeout=SeleniumActions.DEFAULT_TIMEOUT).until(
+    def _wait_for_element_clickable(self, locator: tuple) -> WebElement:
+        return WebDriverWait(self.driver, poll_frequency=0.5, timeout=SeleniumActions.DEFAULT_TIMEOUT,
+                             ignored_exceptions=(
+                             StaleElementReferenceException, ElementClickInterceptedException)).until(
             ec.element_to_be_clickable(locator)
         )
+
+    def click_element(self, locator: Any) -> None:
+        element = self._wait_for_element_clickable(locator)
         element.click()
 
     def wait_for_element_visible(self, locator: Any, timeout=DEFAULT_TIMEOUT) -> WebElement:
         return WebDriverWait(self.driver, timeout=timeout).until(
             ec.visibility_of_element_located(locator)
+        )
+
+    def wait_for_element_presence(self, locator: Any, timeout=DEFAULT_TIMEOUT) -> WebElement:
+        return WebDriverWait(self.driver, timeout=timeout).until(
+            ec.presence_of_element_located(locator)
         )
 
     def is_element_displayed(self, locator: tuple[str, str], timeout=DEFAULT_TIMEOUT) -> bool:
@@ -46,7 +57,7 @@ class SeleniumActions:
             return element.is_displayed()
 
     def send_text(self, locator: Any, text: str) -> None:
-        element = self.wait_for_element_visible(locator)
+        element = self._wait_for_element_clickable(locator)
         element.clear()
         element.send_keys(text)
         element.send_keys(Keys.ENTER)

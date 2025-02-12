@@ -9,7 +9,8 @@ class MainPage(object):
         self.actions = SeleniumActions(driver)
 
     def open_main_page(self):
-        return self.actions.driver.get(self.URL)
+        self.actions.driver.delete_all_cookies()
+        return self.actions.driver.get(MainPage.URL)
 
     def click_sign_in(self):
         self.actions.wait_for_element_visible(MainPageLocators.sing_in_btn)
