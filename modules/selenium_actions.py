@@ -1,9 +1,8 @@
-import time
 from typing import Any
 
 from selenium.common import StaleElementReferenceException, ElementClickInterceptedException
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver import Keys
+from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.select import Select
@@ -30,7 +29,7 @@ class SeleniumActions:
     def _wait_for_element_clickable(self, locator: tuple) -> WebElement:
         return WebDriverWait(self.driver, poll_frequency=0.5, timeout=SeleniumActions.DEFAULT_TIMEOUT,
                              ignored_exceptions=(
-                             StaleElementReferenceException, ElementClickInterceptedException)).until(
+                                 StaleElementReferenceException, ElementClickInterceptedException)).until(
             ec.element_to_be_clickable(locator)
         )
 
@@ -58,9 +57,7 @@ class SeleniumActions:
 
     def send_text(self, locator: Any, text: str) -> None:
         element = self._wait_for_element_clickable(locator)
-        element.clear()
         element.send_keys(text)
-        element.send_keys(Keys.ENTER)
 
     def are_any_elements_visible(self, locator: tuple, timeout=DEFAULT_TIMEOUT) -> list[WebElement]:
         return WebDriverWait(self.driver, timeout=timeout).until(
@@ -77,13 +74,35 @@ class SeleniumActions:
             locator = self.find_element(locator)
         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", locator)
 
-    def scroll_n_times(self, n_times: int) -> None:
-        for n in range(1, n_times):
-            self.driver.execute_script("window.scrollBy(0, window.innerHeight);")
-            time.sleep(1)
-
     def select_element_by_text(self, locator, text: str) -> None:
         if not isinstance(locator, WebElement):
             locator = self.find_element(locator)
         select_object = Select(locator)
         return select_object.select_by_visible_text(text)
+
+    def set_element_text(self, dropdown, option_value) -> None:
+        if not isinstance(dropdown, WebElement):
+            dropdown = self.find_element(dropdown)
+        return self.driver.execute_script(
+            "var select = arguments[0];"
+            "for (var i = 0; i < select.options.length; i++) {"
+            "  if (select.options[i].value === arguments[1]) {"
+            "    select.selectedIndex = i;"
+            "    select.dispatchEvent(new Event('change', { bubbles: true }));"
+            "    break;"
+            "  }"
+            "}",
+            dropdown, option_value
+        )
+
+    def select_element_value(self, dropdown, value) -> None:
+        if not isinstance(dropdown, WebElement):
+            dropdown = self.find_element(dropdown)
+        select = Select(dropdown)
+        select.select_by_value(str(value))
+
+    def move_to_element(self, locator):
+        actions = ActionChains(self.driver)
+        if not isinstance(locator, WebElement):
+            locator = self.wait_for_element_presence(locator)
+        return actions.move_to_element(locator)

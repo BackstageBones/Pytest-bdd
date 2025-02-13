@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 
 from locators.registration_page_locators import RegistrationLocators
@@ -18,10 +19,8 @@ class RegistrationPage:
             self.actions.click_element(RegistrationLocators.female_input)
         self.actions.send_text(RegistrationLocators.first_name_input, test_user.name)
         self.actions.send_text(RegistrationLocators.last_name_input, test_user.surname)
-
-        self.actions.send_text(RegistrationLocators.email_input, test_user.email)
         self.actions.send_text(RegistrationLocators.password_input, test_user.password)
-        self.actions.select_element_by_text(RegistrationLocators.days_selector, test_user.date_of_birth.day)
-        self.actions.select_element_by_text(RegistrationLocators.months_selector, test_user.date_of_birth.strftime("%B"))
-        self.actions.select_element_by_text(RegistrationLocators.years_selector, test_user.date_of_birth.year)
+        self.actions.select_element_value(RegistrationLocators.days_selector, test_user.date_of_birth.day)
+        self.actions.select_element_value(RegistrationLocators.months_selector, test_user.date_of_birth.month)
+        self.actions.select_element_value(RegistrationLocators.years_selector, test_user.date_of_birth.year)
         self.actions.click_element(RegistrationLocators.submit_button)

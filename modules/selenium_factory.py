@@ -20,6 +20,7 @@ class SeleniumFactory:
         options.add_argument("--no-sandbox")
         options.add_argument("disable-infobars")
         options.add_argument("enableNetwork")
+        options.add_argument("--disable-cache")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--disable-gpu")
         options.add_argument('--ignore-ssl-errors=yes')

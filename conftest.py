@@ -17,6 +17,11 @@ def test_user(request):
 def pytest_bdd_before_scenario(request, feature, scenario):
     driver = SeleniumFactory.create_driver("chrome")
     request.node.driver = driver
+    driver.delete_all_cookies()
+    driver.execute_cdp_cmd('Storage.clearDataForOrigin', {
+        "origin": '*',
+        "storageTypes": 'all',
+    })
 
     def cleanup():
         driver.close()
