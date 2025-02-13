@@ -1,6 +1,7 @@
 from typing import Any
 
-from selenium.common import StaleElementReferenceException, ElementClickInterceptedException
+from selenium.common import StaleElementReferenceException, ElementClickInterceptedException, \
+    ElementNotInteractableException
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebElement
@@ -59,8 +60,10 @@ class SeleniumActions:
         element = self._wait_for_element_clickable(locator)
         element.send_keys(text)
 
-    def are_any_elements_visible(self, locator: tuple, timeout=DEFAULT_TIMEOUT) -> list[WebElement]:
-        return WebDriverWait(self.driver, timeout=timeout).until(
+    def are_any_elements_visible(self, locator: Any, timeout=DEFAULT_TIMEOUT) -> list[WebElement]:
+        return WebDriverWait(self.driver, timeout=timeout, poll_frequency=0.5,
+                             ignored_exceptions=(
+                             StaleElementReferenceException, ElementNotInteractableException)).until(
             ec.visibility_of_any_elements_located(locator)
         )
 
@@ -100,6 +103,18 @@ class SeleniumActions:
             dropdown = self.find_element(dropdown)
         select = Select(dropdown)
         select.select_by_value(str(value))
+
+    def select_element_text(self, dropdown, value) -> None:
+        if not isinstance(dropdown, WebElement):
+            dropdown = self.find_element(dropdown)
+        select = Select(dropdown)
+        select.select_by_visible_text(str(value))
+
+    def get_selector_options(self, dropdown):
+        if not isinstance(dropdown, WebElement):
+            dropdown = self.find_element(dropdown)
+        select = Select(dropdown)
+        return select.options
 
     def move_to_element(self, locator):
         actions = ActionChains(self.driver)
