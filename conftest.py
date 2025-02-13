@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-
+import allure
 import pytest
 
 from modules.UserFactory import UserFactory
@@ -38,4 +38,5 @@ def pytest_exception_interact(node, call, report):
         screenshot_name = "screenshot_{}.png".format(datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
         screenshot_path = os.path.abspath("screenshots/" + screenshot_name)
         node.driver.save_screenshot(screenshot_path)
+        allure.attach.file(screenshot_path, name=screenshot_name, attachment_type=allure.attachment_type.PNG)
     yield

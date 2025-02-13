@@ -1,5 +1,4 @@
-import time
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from locators.registration_page_locators import RegistrationLocators
 from modules.selenium_actions import SeleniumActions
@@ -11,6 +10,7 @@ class RegistrationPage:
         self.actions = SeleniumActions(driver)
 
     def fill_registration_form(self, test_user: dataclass):
+        print(asdict(test_user))
         self.actions.wait_for_element_visible(RegistrationLocators.form)
         self.actions.scroll_to_element_center(RegistrationLocators.form)
         if test_user.gender == "M":

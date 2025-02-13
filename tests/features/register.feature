@@ -1,8 +1,6 @@
 # Created by amien at 12/02/2025
 Feature: Automation practice user registration
-  # Enter feature description here
 
-  @acceptance
   Scenario: Register new user
     Given User opens automation practice website
     When User chooses to sign in

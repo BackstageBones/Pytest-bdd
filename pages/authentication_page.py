@@ -15,4 +15,6 @@ class AuthenticationPage:
         self.actions.wait_for_element_visible(AuthenticationPageLocators.sign_in_button)
         self.actions.send_text(AuthenticationPageLocators.sing_in_email_input, email)
         self.actions.send_text(AuthenticationPageLocators.password_input, password)
+
+    def click_sign_in_button(self):
         self.actions.click_element(AuthenticationPageLocators.sign_in_button)

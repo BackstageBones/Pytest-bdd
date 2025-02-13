@@ -1,5 +1,5 @@
-
 from dataclasses import dataclass
+
 from faker import Faker
 from polyfactory.factories import DataclassFactory
 
