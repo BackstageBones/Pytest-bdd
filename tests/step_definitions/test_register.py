@@ -13,10 +13,8 @@ from pages.registration_page import RegistrationPage
 from pages.shipping_page import ShippingPage
 from pages.shopping_cart_page import ShoppingCartPage
 
-scenarios("shopping flow.feature")
+scenarios("shopping flow.feature", "register.feature", "login.feature")
 
-
-# "register.feature", "login.feature",
 
 def adopt_test_user(test_user, user):
     if user in UsersEnum.__members__:
