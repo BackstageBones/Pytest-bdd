@@ -1,8 +1,9 @@
+import time
 from typing import Any
 
 from selenium.common import StaleElementReferenceException, ElementClickInterceptedException, \
     ElementNotInteractableException
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebElement
 from selenium.webdriver.support import expected_conditions as ec
@@ -38,8 +39,10 @@ class SeleniumActions:
         element = self._wait_for_element_clickable(locator)
         element.click()
 
-    def wait_for_element_visible(self, locator: Any, timeout=DEFAULT_TIMEOUT) -> WebElement:
-        return WebDriverWait(self.driver, timeout=timeout).until(
+    def wait_for_element_visible(self, locator: Any, timeout=DEFAULT_TIMEOUT, poll_frequency=.05) -> WebElement:
+        return WebDriverWait(self.driver, timeout=timeout, poll_frequency=poll_frequency,
+                             ignored_exceptions=(
+                                 StaleElementReferenceException, ElementNotInteractableException)).until(
             ec.visibility_of_element_located(locator)
         )
 
@@ -48,13 +51,25 @@ class SeleniumActions:
             ec.presence_of_element_located(locator)
         )
 
-    def is_element_displayed(self, locator: tuple[str, str], timeout=DEFAULT_TIMEOUT) -> bool:
+    def is_element_displayed(self, locator: tuple[str, str], timeout=DEFAULT_TIMEOUT, poll_frequency=0.5) -> bool:
         try:
-            element = self.wait_for_element_visible(locator, timeout=timeout)
+            element = self.wait_for_element_visible(locator, timeout=timeout, poll_frequency=poll_frequency)
         except TimeoutException:
             return False
         else:
             return element.is_displayed()
+
+    def is_displayed_persistent(self, locator, timeout=5) -> bool:
+        i = 0
+        while i <= timeout:
+            try:
+                element = self.wait_for_element_visible(locator, timeout=1)
+            except TimeoutException:
+                return False
+            if not element.is_displayed():
+                return False
+            time.sleep(0.5)
+            i += 0.5
 
     def send_text(self, locator: Any, text: str) -> None:
         element = self._wait_for_element_clickable(locator)
@@ -63,7 +78,7 @@ class SeleniumActions:
     def are_any_elements_visible(self, locator: Any, timeout=DEFAULT_TIMEOUT) -> list[WebElement]:
         return WebDriverWait(self.driver, timeout=timeout, poll_frequency=0.5,
                              ignored_exceptions=(
-                             StaleElementReferenceException, ElementNotInteractableException)).until(
+                                 StaleElementReferenceException, ElementNotInteractableException)).until(
             ec.visibility_of_any_elements_located(locator)
         )
 

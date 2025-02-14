@@ -1,6 +1,6 @@
 # Created by amien at 12/02/2025
 Feature: Automation practice login
-  # Enter feature description here
+
 
   Scenario: Login to shop
     Given User opens automation practice website

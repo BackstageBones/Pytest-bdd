@@ -56,7 +56,8 @@ class MainPage(object):
         self.actions.click_element(product)
 
     def add_product_to_basket(self):
-        if not self.actions.is_element_displayed(MainPageLocators.add_to_cart_button, timeout=5):
+        self.actions.wait_for_element_visible(MainPageLocators.form)
+        if not self.actions.is_displayed_persistent(MainPageLocators.add_to_cart_button, timeout=3):
             available = False
             for size in self.actions.get_selector_options(MainPageLocators.sizes_selector):
                 for color in self.actions.find_elements(MainPageLocators.changeable_colors):

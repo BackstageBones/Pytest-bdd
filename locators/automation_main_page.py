@@ -10,6 +10,7 @@ class MainPageLocators:
     sort_by_selector: By = (By.ID, "selectProductSort")
     products_availability_label: By = (By.XPATH, "//span[@class='availability']")
     product_label_ancestor: By = (By.XPATH, "./ancestor::div[@class='product-container']//a[@class='product-name']")
+    form: By = (By.ID, "buy_block")
     add_to_cart_button: By = (By.XPATH, "//button[@name='Submit']")
     changeable_colors: By = (By.XPATH, "//ul[@id='color_to_pick_list']/li")
     sizes_selector: By = (By.XPATH, "//select[@id='group_1']")

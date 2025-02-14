@@ -4,14 +4,19 @@ from assertpy import assert_that
 from pytest_bdd import given, when, then, parsers, scenarios, step
 
 from modules.UsersEnum import UsersEnum
+from pages.address_page import AddressPage
 from pages.authentication_page import AuthenticationPage
 from pages.automation_practice_main_page import MainPage
 from pages.my_account_page import MyAccountPage
+from pages.payment_page import PaymentPage
 from pages.registration_page import RegistrationPage
+from pages.shipping_page import ShippingPage
 from pages.shopping_cart_page import ShoppingCartPage
 
-scenarios("register.feature", "login.feature", "shopping flow.feature")
+scenarios("shopping flow.feature")
 
+
+# "register.feature", "login.feature",
 
 def adopt_test_user(test_user, user):
     if user in UsersEnum.__members__:
@@ -20,7 +25,7 @@ def adopt_test_user(test_user, user):
     return test_user
 
 
-@when("User chooses to sign in")
+@step("User chooses to sign in")
 def step_impl(request):
     main_page = MainPage(request.node.driver)
     main_page.click_sign_in()
@@ -68,13 +73,13 @@ def step_impl(request):
     authentication_page.click_sign_in_button()
 
 
-@then("User is logged in")
+@step("User is logged in")
 def step_impl(request):
     account_page = MyAccountPage(request.node.driver)
     assert_that(account_page.is_page_displayed(), "Account page not visible").is_true()
 
 
-@when(parsers.parse("User searches for {param} in product search bar"))
+@step(parsers.parse("User searches for {param} in product search bar"))
 def step_impl(request, param):
     main_page = MainPage(request.node.driver)
     main_page.search_for(param.lower())
@@ -86,7 +91,7 @@ def step_impl(request):
     assert_that(main_page.are_products_displayed(), "At least one product is expected to be present").is_true()
 
 
-@step(parsers.parse("User sorts displayed results by {param} param"))
+@when(parsers.parse("User sorts displayed results by {param} param"))
 def step_impl(request, param):
     main_page = MainPage(request.node.driver)
     main_page.filter_products_by(param.lower())
@@ -114,8 +119,49 @@ def step_impl(request):
     main_page.click_add_to_basket()
 
 
-@given("User can proceed with product to checkout")
+@step("User can proceed with product to checkout")
 def step_impl(request):
     sh_page = ShoppingCartPage(request.node.driver)
     assert_that(sh_page.is_page_loaded(), "Shopping cart page not visible").is_true()
     sh_page.click_proceed_to_checkout()
+
+
+@step("User provides address details for shipment")
+def step_impl(request, test_user):
+    address_page = AddressPage(request.node.driver)
+    assert_that(address_page.is_page_loaded(), "Address page not visible").is_true()
+    address_page.fill_delivery_details(test_user)
+
+
+@step("User proceeds to checkout on address page")
+def step_impl(request):
+    address_page = AddressPage(request.node.driver)
+    assert_that(address_page.is_page_loaded(), "Address page not visible").is_true()
+    address_page.click_proceed_to_checkout()
+
+
+@step("Ticks terms of service checkbox")
+def step_impl(request):
+    shipping_page = ShippingPage(request.node.driver)
+    assert_that(shipping_page.is_page_loaded(), "Shipping page not visible").is_true()
+    shipping_page.tick_terms_of_service()
+
+
+@step("User goes to payment page with proceed to checkout button")
+def step_impl(request):
+    shipping_page = ShippingPage(request.node.driver)
+    shipping_page.click_proceed_to_checkout()
+
+
+@then("User is able to finalise shopping with bank wire payment")
+def step_impl(request):
+    payment_page = PaymentPage(request.node.driver)
+    assert_that(payment_page.is_page_loaded(), "Payment page not visible").is_true()
+    payment_page.click_pay_by_wire()
+    payment_page.submit_payment()
+
+
+@step("Order complete success message is displayed")
+def step_impl(request):
+    payment_page = PaymentPage(request.node.driver)
+    assert_that(payment_page.is_payment_completed(), "Payment success message not visible").is_true()
