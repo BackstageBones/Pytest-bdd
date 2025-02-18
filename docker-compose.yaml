@@ -10,7 +10,7 @@ services:
       sh -c "
       pip install --no-cache-dir -r requirements.txt &&
       apt-get update && apt-get install -y chromium chromium-driver openjdk-17-jdk-headless &&
-      pytest --alluredir=/allure-results --clean-alluredir"
+      pytest --alluredir allure-results"
 
     depends_on:
       - allure-server
