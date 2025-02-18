@@ -5,12 +5,13 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - allure-results:/allure-results
+      - allure-results:/app/allure-results
     command: >
       sh -c "
       pip install --no-cache-dir -r requirements.txt &&
       apt-get update && apt-get install -y chromium chromium-driver openjdk-17-jdk-headless &&
-      pytest --alluredir allure-results"
+      pytest --alluredir=allure-results --verbose;
+      tail -f /dev/null"
 
     depends_on:
       - allure-server
